@@ -16,14 +16,14 @@ server_scripts {
     'server/module/*.lua'
 }
 
-files {
-    'ui/*.ogg',
-    'ui/css/*.css',
-    'ui/js/*.js',
-    'ui/index.html',
-}
+-- files {
+--     'ui/*.ogg',
+--     'ui/css/*.css',
+--     'ui/js/*.js',
+--     'ui/index.html',
+-- }
 
-ui_page 'ui/index.html'
+-- ui_page 'ui/index.html'
 
 provides {
 	'mumble-voip'

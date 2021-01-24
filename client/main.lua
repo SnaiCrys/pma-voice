@@ -4,7 +4,7 @@ local volume = 0.3
 local intialized = false
 local voiceTarget = 1
 
--- this is used for my hud, if you don't want it you can delete it 
+-- this is used for my hud, if you don't want it you can delete it
 AddEventHandler('pma-voice:settingsCallback', function(cb)
 	cb(Cfg)
 end)
@@ -57,7 +57,28 @@ function playMicClicks(clickType)
 end
 
 local playerMuted = false
-RegisterCommand('+cycleproximity', function()
+-- RegisterCommand('+cycleproximity', function()
+-- 	if not playerMuted then
+-- 		local voiceMode = voiceData.mode
+-- 		local newMode = voiceMode + 1
+
+-- 		voiceMode = (newMode <= #Cfg.voiceModes and newMode) or 1
+-- 		MumbleSetAudioInputDistance(Cfg.voiceModes[voiceMode][1] + 0.0)
+-- 		voiceData.mode = voiceMode
+-- 		-- make sure we update the UI to the latest voice mode
+-- 		SendNUIMessage({
+-- 			voiceMode = voiceMode - 1
+-- 		})
+-- 		TriggerEvent('pma-voice:setTalkingMode', voiceMode)
+-- 	end
+-- end, false)
+-- RegisterCommand('-cycleproximity', function()
+-- end)
+-- RegisterKeyMapping('+cycleproximity', 'Cycle Proximity', 'keyboard', GetConvar('voice_defaultCycle', 'F11'))
+
+RegisterNetEvent("newvoice:volume-cycle")
+AddEventHandler("newvoice:volume-cycle", function()
+	local tag
 	if not playerMuted then
 		local voiceMode = voiceData.mode
 		local newMode = voiceMode + 1
@@ -65,16 +86,28 @@ RegisterCommand('+cycleproximity', function()
 		voiceMode = (newMode <= #Cfg.voiceModes and newMode) or 1
 		MumbleSetAudioInputDistance(Cfg.voiceModes[voiceMode][1] + 0.0)
 		voiceData.mode = voiceMode
-		-- make sure we update the UI to the latest voice mode
-		SendNUIMessage({
-			voiceMode = voiceMode - 1
-		})
+		tag = Cfg.voiceModes[voiceMode][2]
+
 		TriggerEvent('pma-voice:setTalkingMode', voiceMode)
 	end
-end, false)
-RegisterCommand('-cycleproximity', function()
+
+  	TriggerEvent('uigta:volume-cycle', tag)
 end)
-RegisterKeyMapping('+cycleproximity', 'Cycle Proximity', 'keyboard', GetConvar('voice_defaultCycle', 'F11'))
+
+Citizen.CreateThread(function()
+	while true do
+		Wait(1)
+
+		if IsControlJustPressed(0, 249) then
+			TriggerEvent('uigta:togglevoice', true)
+		end
+
+		if IsControlJustReleased(0, 249) then
+			TriggerEvent('uigta:togglevoice', false)
+		end
+
+	end
+end)
 
 RegisterNetEvent('pma-voice:mutePlayer')
 AddEventHandler('pma-voice:mutePlayer', function()
@@ -183,7 +216,7 @@ AddEventHandler('onClientResourceStart', function(resource)
 	print('[pma-voice] Intitalized voices.')
 	intialized = true
 
-	-- not waiting right here (in testing) let to some cases of the UI 
+	-- not waiting right here (in testing) let to some cases of the UI
 	-- just not working at all.
 	Wait(1000)
 	if GetConvarInt('voice_enableUi', 1) == 1 then
